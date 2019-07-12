@@ -5,6 +5,7 @@ import Physics from './utils/physics'
 
 // subjects
 import SceneSubject from './sceneSubjects/SceneSubject'
+import Ground from './sceneSubjects/Ground'
 
 const OrbitControls = OrbitControlsModule(THREE)
 
@@ -17,7 +18,11 @@ export default class SceneManager {
 
   buildScene = () => {
     const scene = new Physics.Scene()
+    scene.setGravity(new THREE.Vector3(0, -30, 0))
     scene.background = new THREE.Color('#000')
+    scene.addEventListener('update', () => {
+      scene.simulate(undefined, 2)
+    })
 
     return scene
   }
@@ -67,13 +72,14 @@ export default class SceneManager {
 
   createSceneSubjects = scene => {
     const sceneSubjects = [
-      new SceneSubject(scene)
+      new SceneSubject(scene),
+      new Ground(scene)
     ]
 
     return sceneSubjects
   }
 
-  constructor (canvas, debugMode = false) {
+  constructor(canvas, debugMode = false) {
     this.debugMode = debugMode
     this.canvas = canvas
     this.screenDimentions = {
@@ -91,7 +97,7 @@ export default class SceneManager {
     }
   }
 
-  update () {
+  update() {
     if (this.debugMode) this.stats.begin()
 
     const delta = this.clock.getDelta()
@@ -109,7 +115,7 @@ export default class SceneManager {
     if (this.debugMode) this.stats.end()
   }
 
-  resizeHandler () {
+  resizeHandler() {
     const { width, height } = this.canvas
 
     this.screenDimentions = { width, height }
