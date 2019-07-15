@@ -15,6 +15,9 @@ Physics.scripts.ammo = '/libs/ammo.js'
 
 export default class SceneManager {
   clock = new THREE.Clock()
+  mouse = new THREE.Vector2()
+
+  isRayCasterOn = false
 
   buildScene = () => {
     const scene = new Physics.Scene()
@@ -79,7 +82,7 @@ export default class SceneManager {
     return sceneSubjects
   }
 
-  constructor(canvas, debugMode = false) {
+  constructor (canvas, debugMode = false) {
     this.debugMode = debugMode
     this.canvas = canvas
     this.screenDimentions = {
@@ -87,6 +90,7 @@ export default class SceneManager {
       height: this.canvas.height
     }
 
+    this.raycaster = new THREE.Raycaster()
     this.scene = this.buildScene()
     this.renderer = this.buildRender(this.screenDimentions)
     this.camera = this.buildCamera(this.screenDimentions)
@@ -97,7 +101,7 @@ export default class SceneManager {
     }
   }
 
-  update() {
+  update () {
     if (this.debugMode) this.stats.begin()
 
     const delta = this.clock.getDelta()
@@ -107,6 +111,8 @@ export default class SceneManager {
 
     this.scene.simulate()
 
+    this.rayCasterIntersection()
+
     this.renderer.render(
       this.scene,
       this.camera
@@ -115,7 +121,20 @@ export default class SceneManager {
     if (this.debugMode) this.stats.end()
   }
 
-  resizeHandler() {
+  rayCasterIntersection () {
+    if (!this.isRayCasterOn) return
+
+    this.raycaster.setFromCamera(this.mouse, this.camera)
+
+    this.sceneSubjects.map(subject => {
+      if (!subject.wantsToBeIntersected) return
+
+      const intersect = this.raycaster.intersectObject(subject.mesh)
+      if (intersect.length > 0) subject.triggerIntersection(this.mouse)
+    })
+  }
+
+  resizeHandler () {
     const { width, height } = this.canvas
 
     this.screenDimentions = { width, height }
@@ -124,5 +143,14 @@ export default class SceneManager {
     this.camera.updateProjectionMatrix()
 
     this.renderer.setSize(width, height)
+  }
+
+  userMoveHandler ({ x, y }) {
+    this.mouse.x = x
+    this.mouse.y = y
+  }
+
+  rayCasterControl (isOn = false) {
+    this.isRayCasterOn = isOn
   }
 }
