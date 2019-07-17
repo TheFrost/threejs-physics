@@ -19,7 +19,7 @@ export default class SceneManager {
 
   buildScene = () => {
     const scene = new Physics.Scene()
-    scene.setGravity(new THREE.Vector3(0, -30, 0))
+    scene.setGravity(new THREE.Vector3(0, -50, 0))
     scene.background = new THREE.Color('#000')
     scene.addEventListener('update', () => {
       scene.simulate(undefined, 2)

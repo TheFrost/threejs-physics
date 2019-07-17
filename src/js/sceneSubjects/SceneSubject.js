@@ -5,9 +5,16 @@ export default class SceneSubject {
   wantsToBeIntersected = true
 
   constructor (scene) {
+    const geometry = new THREE.CylinderBufferGeometry(2, 1.5, 4.5, 8)
+    const material = Physics.createMaterial(
+      new THREE.MeshNormalMaterial({
+        flatShading: true
+      }),
+      0.8, 0.5
+    )
     this.mesh = new Physics.CylinderMesh(
-      new THREE.CylinderBufferGeometry(3, 2, 5, 32),
-      new THREE.MeshBasicMaterial({ color: 0xff8888 })
+      geometry,
+      material
     )
 
     this.mesh.position.y = 10
@@ -25,7 +32,7 @@ export default class SceneSubject {
       0, -velocity.y, 0
     ))
     this.mesh.setAngularVelocity(new THREE.Vector3(
-      velocity.y * 0.05, 0, 0
+      velocity.y * 0.1, 0, 0
     ))
   }
 }
