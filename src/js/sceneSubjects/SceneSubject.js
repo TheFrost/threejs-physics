@@ -5,8 +5,8 @@ export default class SceneSubject {
   wantsToBeIntersected = true
 
   constructor (scene) {
-    this.mesh = new Physics.BoxMesh(
-      new THREE.BoxBufferGeometry(5, 5, 5),
+    this.mesh = new Physics.CylinderMesh(
+      new THREE.CylinderBufferGeometry(3, 2, 5, 32),
       new THREE.MeshBasicMaterial({ color: 0xff8888 })
     )
 
@@ -15,14 +15,17 @@ export default class SceneSubject {
     scene.add(this.mesh)
   }
 
-  triggerIntersection ({ x, y }) {
-    this.mesh.position.x = x * 20
-    this.mesh.position.y = y * 20
-    this.mesh.__dirtyPosition = true
-
-    this.mesh.setLinearVelocity(new THREE.Vector3(0, 0, 0))
-    this.mesh.setAngularVelocity(new THREE.Vector3(0, 0, 0))
-  }
-
   update (delta, time) {}
+
+  viewportHandler ({ velocity }) {
+    if (velocity.y === 0) return
+
+    this.mesh.__dirtyPosition = true
+    this.mesh.setLinearVelocity(new THREE.Vector3(
+      0, -velocity.y, 0
+    ))
+    this.mesh.setAngularVelocity(new THREE.Vector3(
+      velocity.y * 0.05, 0, 0
+    ))
+  }
 }

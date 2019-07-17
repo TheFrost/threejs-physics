@@ -17,8 +17,6 @@ export default class SceneManager {
   clock = new THREE.Clock()
   mouse = new THREE.Vector2()
 
-  isRayCasterOn = false
-
   buildScene = () => {
     const scene = new Physics.Scene()
     scene.setGravity(new THREE.Vector3(0, -30, 0))
@@ -90,7 +88,6 @@ export default class SceneManager {
       height: this.canvas.height
     }
 
-    this.raycaster = new THREE.Raycaster()
     this.scene = this.buildScene()
     this.renderer = this.buildRender(this.screenDimentions)
     this.camera = this.buildCamera(this.screenDimentions)
@@ -111,27 +108,12 @@ export default class SceneManager {
 
     this.scene.simulate()
 
-    this.rayCasterIntersection()
-
     this.renderer.render(
       this.scene,
       this.camera
     )
 
     if (this.debugMode) this.stats.end()
-  }
-
-  rayCasterIntersection () {
-    if (!this.isRayCasterOn) return
-
-    this.raycaster.setFromCamera(this.mouse, this.camera)
-
-    this.sceneSubjects.map(subject => {
-      if (!subject.wantsToBeIntersected) return
-
-      const intersect = this.raycaster.intersectObject(subject.mesh)
-      if (intersect.length > 0) subject.triggerIntersection(this.mouse)
-    })
   }
 
   resizeHandler () {
@@ -150,7 +132,7 @@ export default class SceneManager {
     this.mouse.y = y
   }
 
-  rayCasterControl (isOn = false) {
-    this.isRayCasterOn = isOn
+  viewportHandler (data) {
+    this.sceneSubjects.map(s => s.viewportHandler ? s.viewportHandler(data) : null)
   }
 }
