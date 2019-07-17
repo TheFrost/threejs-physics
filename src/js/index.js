@@ -22,8 +22,13 @@ const resizeCanvas = () => {
 
 const onUserMoveHandler = (e) => {
   if (!isUserMoveCatch) return
-  viewportUserHandler(e)
-  sceneManager.userMoveHandler(getNormUserCoords(e))
+
+  const target = e.touches
+    ? e.touches[0]
+    : e
+
+  viewportUserHandler(target)
+  sceneManager.userMoveHandler(getNormUserCoords(target))
 }
 
 const onUserCatchHandler = () => {
@@ -39,8 +44,11 @@ const bindEvents = () => {
   resizeCanvas()
 
   window.addEventListener('mousemove', onUserMoveHandler, false)
+  window.addEventListener('touchmove', onUserMoveHandler, false)
   window.addEventListener('mousedown', onUserCatchHandler, false)
+  window.addEventListener('touchstart', onUserCatchHandler, false)
   window.addEventListener('mouseup', onUserUncatchHandler, false)
+  window.addEventListener('touchend', onUserUncatchHandler, false)
   watchViewport((data) => sceneManager.viewportHandler(data))
 }
 
